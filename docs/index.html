@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Validar CUIT y CBU, número a letras y feriados de Argentina · Gratis</title>
+<meta name="description" content="Herramientas gratis para Argentina: validar CUIT/CUIL, sacar el CUIT desde el DNI, validar CBU y CVU, pasar números a letras para recibos y cheques, y feriados nacionales. Funciona sin internet, no guarda nada.">
+<style>
+:root{--fondo:#f5f6f8;--tarjeta:#fff;--texto:#1d2330;--suave:#667085;--borde:#e3e6eb;--acento:#1F3A3D;--ok:#1e8a4c;--okf:#e3f6eb;--mal:#c0392b;--malf:#fde8e5}
+@media (prefers-color-scheme:dark){:root{--fondo:#0f1418;--tarjeta:#182027;--texto:#e8edf2;--suave:#9aa6b2;--borde:#2a343d;--acento:#7cc4b8;--okf:#123824;--malf:#3b1714;--ok:#5fd394;--mal:#ff8a7a}}
+*{box-sizing:border-box}body{margin:0;background:var(--fondo);color:var(--texto);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:24px 16px 60px}h1{font-size:1.7rem;margin:.2em 0}h2{font-size:1.15rem;margin:0 0 .6em}
+.sub{color:var(--suave);margin:0 0 20px}.tarjeta{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:18px;margin:14px 0}
+label{display:block;font-size:.9rem;color:var(--suave);margin:.4em 0 .2em}input,select{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--borde);border-radius:10px;background:var(--fondo);color:var(--texto)}
+.fila{display:flex;gap:10px;flex-wrap:wrap}.fila>*{flex:1 1 160px}
+.res{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--fondo);min-height:1.5em;word-break:break-word}
+.res.ok{background:var(--okf);color:var(--ok)}.res.mal{background:var(--malf);color:var(--mal)}
+button{font:inherit;padding:8px 14px;border-radius:10px;border:1px solid var(--borde);background:var(--tarjeta);color:var(--texto);cursor:pointer;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:.95rem}td{padding:6px 4px;border-bottom:1px solid var(--borde)}td:first-child{white-space:nowrap;color:var(--suave);width:9em}
+.pasado{opacity:.45}.prox{font-weight:700}footer{color:var(--suave);font-size:.9rem;text-align:center;margin-top:30px}a{color:var(--acento)}
+.cafe{background:var(--acento);color:#fff;border-radius:14px;padding:14px;text-align:center}@media (prefers-color-scheme:dark){.cafe{color:#0f1418}}
+</style>
+</head>
+<body><main>
+<h1>Herramientas para Argentina 🇦🇷</h1>
+<p class="sub">Gratis y sin publicidad. Todo se calcula en tu navegador: no se envía ni se guarda nada.</p>
+
+<section class="tarjeta" id="cuit">
+<h2>Validar CUIT / CUIL</h2>
+<label for="c1">CUIT o CUIL (con o sin guiones)</label><input id="c1" inputmode="numeric" placeholder="20-12345678-9">
+<div class="res" id="c1r">Escribí un número.</div>
+<h2 style="margin-top:1em">Sacar el CUIL desde el DNI</h2>
+<div class="fila"><div><label for="c2">DNI</label><input id="c2" inputmode="numeric" placeholder="12345678"></div>
+<div><label for="c3">Tipo</label><select id="c3"><option value="masculino">Masculino</option><option value="femenino">Femenino</option><option value="empresa">Empresa</option></select></div></div>
+<div class="res" id="c2r">—</div>
+<p class="sub" style="margin:.6em 0 0;font-size:.85rem">Es el cálculo estándar. El número oficial lo asigna ANSES/ARCA: confirmalo ahí si es para un trámite.</p>
+</section>
+
+<section class="tarjeta" id="cbu">
+<h2>Validar CBU o CVU</h2>
+<label for="b1">CBU o CVU (22 números)</label><input id="b1" inputmode="numeric" placeholder="22 números">
+<div class="res" id="b1r">Pegá el número para revisar que no tenga errores de tipeo.</div>
+<p class="sub" style="margin:.6em 0 0;font-size:.85rem">Revisa los dígitos verificadores. No confirma que la cuenta exista ni quién es el titular.</p>
+</section>
+
+<section class="tarjeta" id="letras">
+<h2>Número a letras (recibos, cheques, facturas)</h2>
+<div class="fila"><div><label for="n1">Importe</label><input id="n1" inputmode="decimal" placeholder="1.234,56"></div>
+<div><label for="n2">Centavos</label><select id="n2"><option value="fraccion">con 56/100</option><option value="letras">en letras</option></select></div></div>
+<label><input type="checkbox" id="n3" style="width:auto"> En mayúsculas</label>
+<div class="res" id="n1r">—</div><button id="n1c">Copiar</button>
+</section>
+
+<section class="tarjeta" id="feriados">
+<h2>Feriados nacionales</h2>
+<div class="fila"><div><label for="f1">Año</label><select id="f1"></select></div></div>
+<div class="res" id="f1p"></div>
+<table id="f1t"></table>
+<p class="sub" style="margin:.6em 0 0;font-size:.85rem">Según la Ley 27.399. No incluye los días no laborables ni los feriados provinciales. El Gobierno a veces cambia un traslado por decreto: confirmá en argentina.gob.ar.</p>
+</section>
+
+<div class="cafe">¿Te sirvió? Invitame un café ☕ · Alias: <b>igna.pelliza</b></div>
+<footer>Código abierto (MIT) en <a href="https://github.com/IgnacioPelliza/utilidades-argentina">GitHub</a> · Hecho en San Juan por Ignacio Pelliza</footer>
+</main>
+<script src="argentina.js"></script>
+<script>
+const A = window.Argentina, $ = (id) => document.getElementById(id);
+const pinta = (el, txt, cls) => { el.textContent = txt; el.className = 'res' + (cls ? ' ' + cls : ''); };
+$('c1').addEventListener('input', (e) => {
+  const d = e.target.value.replace(/\D/g, '');
+  if (!d) return pinta($('c1r'), 'Escribí un número.');
+  if (d.length < 11) return pinta($('c1r'), `Faltan ${11 - d.length} números.`);
+  A.validarCuit(d) ? pinta($('c1r'), '✓ Válido: ' + A.formatearCuit(d), 'ok') : pinta($('c1r'), '✗ No es válido (revisá los números).', 'mal');
+});
+const dni = () => { const v = $('c2').value.replace(/\D/g, ''); if (!v) return pinta($('c2r'), '—'); try { pinta($('c2r'), A.cuitDesdeDni(v, $('c3').value), 'ok'); } catch (e) { pinta($('c2r'), e.message, 'mal'); } };
+$('c2').addEventListener('input', dni); $('c3').addEventListener('change', dni);
+$('b1').addEventListener('input', (e) => {
+  const d = e.target.value.replace(/\D/g, '');
+  if (!d) return pinta($('b1r'), 'Pegá el número para revisar que no tenga errores de tipeo.');
+  const r = A.analizarCbu(d);
+  r.valido ? pinta($('b1r'), `✓ ${r.tipo} válido${r.banco ? ' · ' + r.banco : ''}`, 'ok') : pinta($('b1r'), '✗ ' + r.motivo, 'mal');
+});
+const letras = () => {
+  const v = $('n1').value.trim(); if (!v) return pinta($('n1r'), '—');
+  try { pinta($('n1r'), A.numeroALetras(v.includes(',') || /\.\d{3}/.test(v) ? v : Number(v), { moneda: 'pesos', centavos: $('n2').value, mayusculas: $('n3').checked })); }
+  catch (e) { pinta($('n1r'), 'Escribí un importe válido.', 'mal'); }
+};
+['n1', 'n2', 'n3'].forEach((id) => $(id).addEventListener('input', letras));
+$('n1c').addEventListener('click', () => { navigator.clipboard && navigator.clipboard.writeText($('n1r').textContent); $('n1c').textContent = 'Copiado ✓'; setTimeout(() => $('n1c').textContent = 'Copiar', 1500); });
+const hoy = new Date(), hoyIso = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+for (let a = hoy.getFullYear() - 1; a <= hoy.getFullYear() + 3; a++) $('f1').add(new Option(a, a, false, a === hoy.getFullYear()));
+const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+const feri = () => {
+  const lista = A.feriados(+$('f1').value), t = $('f1t'); t.innerHTML = '';
+  const prox = [...A.feriados(hoy.getFullYear()), ...A.feriados(hoy.getFullYear() + 1)].find((f) => f.fecha >= hoyIso);
+  if (prox) { const dias = Math.round((new Date(prox.fecha + 'T00:00') - new Date(hoyIso + 'T00:00')) / 864e5); pinta($('f1p'), dias === 0 ? `Hoy es feriado: ${prox.nombre}` : `Próximo feriado: ${prox.nombre}, en ${dias} día${dias === 1 ? '' : 's'}.`, 'ok'); }
+  for (const f of lista) {
+    const d = new Date(f.fecha + 'T00:00'), tr = t.insertRow();
+    tr.className = f.fecha < hoyIso ? 'pasado' : (prox && f.fecha === prox.fecha ? 'prox' : '');
+    tr.insertCell().textContent = `${DIAS[d.getDay()]} ${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+    tr.insertCell().textContent = f.nombre + (f.tipo === 'trasladable' ? ' (trasladable)' : '');
+  }
+};
+$('f1').addEventListener('change', feri); feri();
+</script>
+</body></html>
