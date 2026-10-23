@@ -170,6 +170,100 @@
     return iso(d);
   }
 
+  // ---------- Laboral (Ley de Contrato de Trabajo 20.744, con la Ley 27.802 de 2026) ----------
+  // Todo es una estimación: el convenio colectivo y cada caso pueden cambiar el resultado.
+  const r2 = (n) => Math.round(n * 100) / 100;
+  const D0 = (s) => new Date(aIso(s) + 'T00:00:00Z');
+  const diasEntre = (a, b) => Math.round((D0(b) - D0(a)) / 864e5); // b - a
+  const masMeses = (f, m) => { const d = D0(f); const dia = d.getUTCDate(); d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth() + m);
+    const ult = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate(); d.setUTCDate(Math.min(dia, ult)); return iso(d); };
+  const diasDelMes = (f) => { const d = D0(f); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate(); };
+  const diasDelAnio = (a) => (a % 4 === 0 && (a % 100 !== 0 || a % 400 === 0) ? 366 : 365);
+  function chequear(n, nombre) { if (!Number.isFinite(n) || n < 0) throw new Error(nombre + ' tiene que ser un número positivo'); }
+  function antiguedad(ingreso, egreso) { // años, meses y días completos
+    if (aIso(egreso) < aIso(ingreso)) throw new Error('La fecha de egreso es anterior al ingreso');
+    let meses = 0; while (masMeses(ingreso, meses + 1) <= aIso(egreso)) meses++;
+    return { anios: Math.floor(meses / 12), meses: meses % 12, dias: diasEntre(masMeses(ingreso, meses), egreso) };
+  }
+  // Aguinaldo (SAC): la mitad del mejor sueldo del semestre, proporcional a los días trabajados.
+  function aguinaldo(mejorSueldo, o = {}) {
+    chequear(mejorSueldo, 'El sueldo');
+    const anio = o.anio || +(o.egreso || aIso(new Date())).slice(0, 4), sem = o.semestre || 1;
+    const ini = sem === 1 ? `${anio}-01-01` : `${anio}-07-01`, fin = sem === 1 ? `${anio}-06-30` : `${anio}-12-31`;
+    const desde = o.ingreso && aIso(o.ingreso) > ini ? aIso(o.ingreso) : ini, hasta = o.egreso && aIso(o.egreso) < fin ? aIso(o.egreso) : fin;
+    const total = diasEntre(ini, fin) + 1, trabajados = Math.max(0, diasEntre(desde, hasta) + 1);
+    return { semestre: sem, anio, diasSemestre: total, diasTrabajados: trabajados, completo: r2(mejorSueldo / 2), monto: r2(mejorSueldo / 2 * trabajados / total) };
+  }
+  // Vacaciones (arts. 150, 153 y 155): días por antigüedad al 31/12 y pago = sueldo / 25 por día.
+  function diasVacaciones(ingreso, anio) {
+    const a = antiguedad(ingreso, `${anio}-12-31`).anios;
+    const dias = a < 5 ? 14 : a < 10 ? 21 : a < 20 ? 28 : 35;
+    // si entró ese año y no llegó a trabajar la mitad de los días hábiles: 1 día cada 20 trabajados
+    const ini = aIso(ingreso) > `${anio}-01-01` ? aIso(ingreso) : `${anio}-01-01`;
+    let habAnio = 0, habTrab = 0;
+    for (let d = D0(`${anio}-01-01`); iso(d) <= `${anio}-12-31`; d = mas(d, 1)) if (esDiaHabil(iso(d))) { habAnio++; if (iso(d) >= ini) habTrab++; }
+    if (habTrab < habAnio / 2) return { dias: Math.floor(habTrab / 20), antiguedadAnios: a, proporcional: true, habilesTrabajados: habTrab };
+    return { dias, antiguedadAnios: a, proporcional: false, habilesTrabajados: habTrab };
+  }
+  function vacaciones(sueldo, ingreso, anio) {
+    chequear(sueldo, 'El sueldo');
+    const v = diasVacaciones(ingreso, anio || new Date().getFullYear());
+    return Object.assign(v, { porDia: r2(sueldo / 25), monto: r2(sueldo / 25 * v.dias), plus: r2((sueldo / 25 - sueldo / 30) * v.dias) });
+  }
+  // Sueldo neto: aportes del trabajador 11% jubilación + 3% PAMI (Ley 19.032) + 3% obra social. No incluye Ganancias.
+  function sueldoNeto(bruto, o = {}) {
+    chequear(bruto, 'El sueldo bruto');
+    const base = o.tope ? Math.min(bruto, o.tope) : bruto, sind = (o.sindicato || 0) / 100;
+    const jub = r2(base * 0.11), pami = r2(base * 0.03), os = r2(base * 0.03), sin = r2(bruto * sind);
+    const desc = r2(jub + pami + os + sin);
+    return { bruto: r2(bruto), base: r2(base), jubilacion: jub, pami, obraSocial: os, sindicato: sin, descuentos: desc, neto: r2(bruto - desc) };
+  }
+  // Liquidación final por despido sin causa.
+  function liquidacionDespido(o) {
+    const sueldo = Number(o.sueldo); chequear(sueldo, 'El sueldo');
+    const ingreso = aIso(o.ingreso), egreso = aIso(o.egreso), ant = antiguedad(ingreso, egreso);
+    const prueba = masMeses(ingreso, 6) > egreso; // período de prueba: 6 meses (art. 92 bis)
+    const rubros = [];
+    const add = (concepto, monto, nota) => rubros.push({ concepto, monto: r2(monto), nota: nota || '' });
+    // días trabajados del mes de egreso
+    const diaEgreso = +egreso.slice(8, 10), primeroDelMes = egreso.slice(0, 8) + '01';
+    const diasMes = Math.min(diaEgreso, diasEntre(ingreso > primeroDelMes ? ingreso : primeroDelMes, egreso) + 1);
+    const dm = diasDelMes(egreso);
+    add('Días trabajados del mes', sueldo / dm * diasMes, `${diasMes} de ${dm} días`);
+    // antigüedad (art. 245)
+    let periodos = 0, base = sueldo, notaBase = '';
+    if (!prueba) {
+      periodos = ant.anios + (masMeses(ingreso, ant.anios * 12 + 3) < egreso ? 1 : 0);
+      periodos = Math.max(1, periodos);
+      if (o.topeConvenio) { const tope = Number(o.topeConvenio); if (sueldo > tope) { base = Math.max(tope, sueldo * 0.67); notaBase = base === tope ? ' (con el tope del convenio)' : ' (tope del convenio, con el piso del 67%)'; } }
+      add('Indemnización por antigüedad (art. 245)', base * periodos, `${periodos} × $ ${r2(base)}${notaBase}`);
+    }
+    // preaviso e integración (arts. 231, 232 y 233): solo si no se avisó
+    let preaviso = 0, integracion = 0;
+    if (!prueba && !o.conPreaviso) {
+      const meses = masMeses(ingreso, 60) < egreso ? 2 : 1; preaviso = sueldo * meses;
+      add('Preaviso no dado', preaviso, `${meses} ${meses === 1 ? 'mes' : 'meses'} de sueldo`);
+      const faltan = diasDelMes(egreso) - diaEgreso;
+      if (faltan > 0) { integracion = sueldo / dm * faltan; add('Integración del mes de despido', integracion, `${faltan} días que faltaban del mes`); }
+    }
+    // aguinaldo proporcional
+    const sem = +egreso.slice(5, 7) <= 6 ? 1 : 2, anio = +egreso.slice(0, 4);
+    const sac = aguinaldo(sueldo, { anio, semestre: sem, ingreso, egreso });
+    add('Aguinaldo proporcional', sac.monto, `${sac.diasTrabajados} de ${sac.diasSemestre} días del semestre`);
+    // vacaciones no gozadas proporcionales (art. 156)
+    const dv = diasVacaciones(ingreso, anio);
+    const inicioAnio = ingreso > `${anio}-01-01` ? ingreso : `${anio}-01-01`;
+    const diasAnio = diasEntre(inicioAnio, egreso) + 1;
+    const diasVac = dv.proporcional ? dv.dias : dv.dias * diasAnio / diasDelAnio(anio);
+    const vac = sueldo / 25 * diasVac;
+    if (!o.sinVacaciones) add('Vacaciones no gozadas', vac, `${r2(diasVac)} días (sueldo / 25)`);
+    // aguinaldo sobre preaviso, integración y vacaciones: criterio habitual de la justicia laboral
+    const sacExtra = (preaviso + integracion + (o.sinVacaciones ? 0 : vac)) / 12;
+    if (sacExtra > 0) add('Aguinaldo sobre preaviso, integración y vacaciones', sacExtra, 'Criterio habitual; confirmalo');
+    return { antiguedad: ant, periodoPrueba: prueba, rubros, total: r2(rubros.reduce((s, x) => s + x.monto, 0)) };
+  }
+
   return { validarCuit, formatearCuit, cuitDesdeDni, digitoCuit, analizarCbu, validarCbu, numeroALetras, formatearPesos, leerPesos,
-    feriados, esFeriado, esDiaHabil, sumarDiasHabiles, pascua: (a) => iso(pascua(a)) };
+    feriados, esFeriado, esDiaHabil, sumarDiasHabiles, pascua: (a) => iso(pascua(a)),
+    antiguedad, aguinaldo, vacaciones, sueldoNeto, liquidacionDespido };
 });

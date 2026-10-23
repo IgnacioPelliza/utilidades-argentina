@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calculadora de aguinaldo 2026 (SAC) · Gratis y sin publicidad</title>
+<meta name="description" content="Calculá tu aguinaldo (SAC) de junio o diciembre 2026, completo o proporcional a los días trabajados. Gratis, sin registrarte y sin publicidad.">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body><main>
+<nav><a href="index.html">CUIT, CBU, letras y feriados</a><a href="aguinaldo.html" class="activo">Aguinaldo</a><a href="vacaciones.html">Vacaciones</a><a href="sueldo-neto.html">Sueldo neto</a><a href="indemnizacion.html">Indemnización</a></nav>
+<h1>Calculadora de aguinaldo 💰</h1>
+<p class="sub">Completo o proporcional, para junio o diciembre.</p>
+<section class="tarjeta">
+<label for="s">Tu mejor sueldo bruto del semestre</label><input id="s" inputmode="decimal" placeholder="1.200.000">
+<div class="fila"><div><label for="sem">Aguinaldo de</label><select id="sem"><option value="1">Junio (1.er semestre)</option><option value="2">Diciembre (2.º semestre)</option></select></div>
+<div><label for="anio">Año</label><select id="anio"></select></div></div>
+<div class="fila"><div><label for="ing">Entraste a trabajar (si fue en este semestre)</label><input id="ing" type="date"></div>
+<div><label for="egr">Te fuiste (si fue en este semestre)</label><input id="egr" type="date"></div></div>
+<div class="res" id="res">—</div>
+<p class="sub" style="font-size:.85rem;margin-top:10px">Es una estimación con la Ley de Contrato de Trabajo y los cambios de la Ley 27.802 (2026). Tu convenio colectivo puede cambiar el resultado: confirmalo con un contador o un abogado laboral.</p>
+</section>
+<section class="tarjeta explica">
+<h2>¿Cómo se calcula el aguinaldo?</h2>
+<p>El aguinaldo (o SAC, sueldo anual complementario) es <b>la mitad del mejor sueldo bruto mensual</b> de cada semestre. Se paga en dos cuotas: la de junio (a más tardar el 30/6) y la de diciembre (a más tardar el 18/12), con 4 días hábiles de gracia.</p>
+<p>Si no trabajaste el semestre completo, se cobra <b>proporcional a los días trabajados</b>: mitad del mejor sueldo × días trabajados ÷ días del semestre (181 o 182 el primero, 184 el segundo).</p>
+<p><b>Ejemplo:</b> mejor sueldo $ 1.200.000 y semestre completo → $ 600.000 brutos.</p>
+</section>
+<div class="cafe">¿Te sirvió? Invitame un café ☕ · Alias: <b>igna.pelliza</b></div>
+<footer>Gratis, sin publicidad y sin guardar nada: todo se calcula en tu navegador.<br>Código abierto (MIT) en <a href="https://github.com/IgnacioPelliza/utilidades-argentina">GitHub</a> · Hecho en San Juan por Ignacio Pelliza</footer>
+</main>
+<script src="argentina.js"></script>
+<script>
+const A = window.Argentina, $ = (id) => document.getElementById(id), P = (n) => A.formatearPesos(n);
+const num = (id) => { const v = $(id).value.trim(); if (!v) return NaN; return v.includes(',') || /\.\d{3}/.test(v) ? A.leerPesos(v) : Number(v); };
+const hoyIso = (() => { const h = new Date(); return `${h.getFullYear()}-${String(h.getMonth() + 1).padStart(2, '0')}-${String(h.getDate()).padStart(2, '0')}`; })();
+const tabla = (filas) => '<table class="detalle">' + filas.map(([a, b, n]) => `<tr><td>${a}${n ? `<small>${n}</small>` : ''}</td><td>${b}</td></tr>`).join('') + '</table>';
+
+const y = new Date().getFullYear(); for (let a = y - 1; a <= y + 1; a++) $('anio').add(new Option(a, a, false, a === y));
+$('sem').value = new Date().getMonth() < 6 ? '1' : '2';
+function calcular() {
+  const s = num('s'); if (!(s > 0)) { $('res').className = 'res'; $('res').textContent = 'Escribí tu sueldo bruto.'; return; }
+  const r = A.aguinaldo(s, { anio: +$('anio').value, semestre: +$('sem').value, ingreso: $('ing').value || undefined, egreso: $('egr').value || undefined });
+  $('res').className = 'res ok';
+  $('res').innerHTML = `<div class="total">${P(r.monto)}</div>` + (r.diasTrabajados < r.diasSemestre ? `Proporcional: trabajaste ${r.diasTrabajados} de ${r.diasSemestre} días del semestre (el completo sería ${P(r.completo)}).` : 'Aguinaldo completo (trabajaste todo el semestre).') + '<br><small>Es bruto: se le descuenta el 17% de aportes, igual que al sueldo.</small>';
+}
+document.querySelectorAll('input,select').forEach((e) => e.addEventListener('input', calcular)); calcular();
+</script>
+</body></html>

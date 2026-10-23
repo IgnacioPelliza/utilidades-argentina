@@ -46,6 +46,34 @@ eq(A.esDiaHabil('2026-10-23'), true, 'viernes hábil'); eq(A.esDiaHabil('2026-10
 eq(A.sumarDiasHabiles('2026-12-23', 2), '2026-12-28', 'hábiles con navidad');
 eq(A.sumarDiasHabiles('2026-12-28', -2), '2026-12-23', 'hábiles hacia atrás');
 
+// Laboral: casos calculados a mano
+eq(A.antiguedad('2020-03-15', '2026-10-23'), { anios: 6, meses: 7, dias: 8 }, 'antigüedad');
+eq(A.aguinaldo(1000000, { anio: 2026, semestre: 2 }).monto, 500000, 'aguinaldo completo');
+eq(A.aguinaldo(1000000, { anio: 2026, semestre: 2, ingreso: '2026-10-01' }).monto, 250000, 'aguinaldo proporcional (92 de 184 días)');
+eq(A.aguinaldo(1000000, { anio: 2026, semestre: 1 }).diasSemestre, 181, 'primer semestre 181 días');
+eq(A.vacaciones(1000000, '2019-02-01', 2026).dias, 21, 'vacaciones 7 años = 21');
+eq(A.vacaciones(1000000, '2021-12-31', 2026).dias, 21, 'vacaciones: 5 años justos al 31/12 = 21');
+eq(A.vacaciones(1000000, '2022-01-02', 2026).dias, 14, 'vacaciones: menos de 5 años al 31/12 = 14');
+eq(A.vacaciones(1000000, '2006-01-01', 2026).dias, 35, 'vacaciones 20 años = 35');
+eq(A.vacaciones(1000000, '2019-02-01', 2026).monto, 840000, 'vacaciones sueldo/25');
+eq(A.vacaciones(1000000, '2026-09-01', 2026).proporcional, true, 'vacaciones: entró tarde, 1 día cada 20');
+eq(A.sueldoNeto(1500000).neto, 1245000, 'neto 17%');
+eq(A.sueldoNeto(3000000, { tope: 2000000 }).descuentos, 340000, 'neto con tope');
+const L1 = A.liquidacionDespido({ ingreso: '2020-03-15', egreso: '2026-10-23', sueldo: 1200000 });
+const R = (n) => L1.rubros.find((x) => x.concepto.startsWith(n)).monto;
+eq(R('Indemnización'), 8400000, '6 años 7 meses = 7 sueldos');
+eq(R('Preaviso'), 2400000, 'más de 5 años = 2 meses');
+eq(R('Días trabajados') + R('Integración'), 1200000, 'mes de despido completo = 1 sueldo');
+eq(A.liquidacionDespido({ ingreso: '2021-10-23', egreso: '2026-10-23', sueldo: 1000000 }).rubros.find((x) => x.concepto.startsWith('Preaviso')).monto, 1000000, 'justo 5 años = 1 mes');
+eq(A.liquidacionDespido({ ingreso: '2025-06-01', egreso: '2026-02-15', sueldo: 1000000 }).rubros.find((x) => x.concepto.startsWith('Indemnización')).monto, 1000000, 'antigüedad: 8 meses = 1 sueldo (mínimo)');
+eq(A.liquidacionDespido({ ingreso: '2025-01-10', egreso: '2026-04-09', sueldo: 1000000 }).rubros.find((x) => x.concepto.startsWith('Indemnización')).monto, 1000000, 'antigüedad: 1 año y 3 meses justos = 1');
+eq(A.liquidacionDespido({ ingreso: '2025-01-10', egreso: '2026-04-11', sueldo: 1000000 }).rubros.find((x) => x.concepto.startsWith('Indemnización')).monto, 2000000, 'antigüedad: más de 3 meses = 2');
+eq(A.liquidacionDespido({ ingreso: '2026-07-01', egreso: '2026-10-23', sueldo: 1200000 }).periodoPrueba, true, 'período de prueba');
+ok(!A.liquidacionDespido({ ingreso: '2026-07-01', egreso: '2026-10-23', sueldo: 1200000 }).rubros.some((x) => /Indemnización|Preaviso/.test(x.concepto)), 'en prueba no hay indemnización ni preaviso');
+eq(A.liquidacionDespido({ ingreso: '2020-03-15', egreso: '2026-10-31', sueldo: 2000000, topeConvenio: 1000000 }).rubros[1].monto, 9380000, 'tope con piso 67%');
+eq(A.liquidacionDespido({ ingreso: '2020-03-15', egreso: '2026-10-31', sueldo: 1200000, topeConvenio: 1000000 }).rubros[1].monto, 7000000, 'tope del convenio');
+ok(!A.liquidacionDespido({ ingreso: '2020-03-15', egreso: '2026-10-31', sueldo: 1200000 }).rubros.some((x) => /Integración/.test(x.concepto)), 'despido el último día: sin integración');
+
 // Python tiene que dar lo mismo
 const py = `
 import sys, json; sys.path.insert(0, 'python'); import argentina as A
@@ -58,11 +86,24 @@ out = {
  'feriados': [A.feriados(a) for a in casos['anios']],
  'cbu': [A.analizar_cbu(c) for c in casos['cbus']],
  'habiles': [A.sumar_dias_habiles(f, n) for f, n in casos['habiles']],
+ 'liq': [A.liquidacion_despido(c['ingreso'], c['egreso'], c['sueldo'], c.get('tope'), c.get('pre', False)) for c in casos['liq']],
+ 'vac': [A.vacaciones(c['sueldo'], c['ingreso'], c['anio']) for c in casos['vac']],
+ 'neto': [A.sueldo_neto(c['b'], c.get('tope'), c.get('sin', 0)) for c in casos['neto']],
+ 'sac': [A.aguinaldo(c['s'], c['anio'], c['sem'], c.get('ingreso'), c.get('egreso')) for c in casos['sac']],
 }
 print(json.dumps(out, ensure_ascii=False))`;
 const nums = [0, 1, 7.25, 21, 99, 100, 101, 999, 1000, 1001, 21000, 21001, 99999, 100000, 999999.99, 1000000, 1000001, 21000000, 123456789.07, 1000000000, 999999999999.99];
 for (let i = 0; i < 300; i++) nums.push(Math.round(((i * 7919) % 100000) * 1013.37) / 100);
-const casos = { dni: [], nums, anios: [], cbus: [cbu, cvu, '123', cbu.slice(0, 21) + '0'], habiles: [] };
+const casos = { dni: [], nums, anios: [], cbus: [cbu, cvu, '123', cbu.slice(0, 21) + '0'], habiles: [], liq: [], vac: [], neto: [], sac: [] };
+const fch = (i, base) => { const d = new Date(Date.UTC(base, 0, 1) + ((i * 7907) % 3650) * 864e5); return d.toISOString().slice(0, 10); };
+for (let i = 0; i < 400; i++) {
+  const ingreso = fch(i, 2001 + (i % 20)); const egr = new Date(new Date(ingreso + 'T00:00:00Z').getTime() + (20 + (i * 3571) % 9000) * 864e5).toISOString().slice(0, 10);
+  const sueldo = 300000 + ((i * 104729) % 3000000) + (i % 7) * 0.37;
+  casos.liq.push({ ingreso, egreso: egr, sueldo, tope: i % 4 === 0 ? sueldo * (0.4 + (i % 5) / 10) : null, pre: i % 6 === 0 });
+  casos.vac.push({ sueldo, ingreso, anio: +egr.slice(0, 4) });
+  casos.neto.push({ b: sueldo, tope: i % 5 === 0 ? 2000000 : null, sin: i % 3 });
+  casos.sac.push({ s: sueldo, anio: +egr.slice(0, 4), sem: 1 + (i % 2), ingreso: i % 2 ? ingreso : null, egreso: i % 3 ? egr : null });
+}
 for (let i = 0; i < 200; i++) casos.dni.push([String(1000000 + i * 4999), ['masculino', 'femenino', 'empresa'][i % 3]]);
 for (let a = 2000; a <= 2060; a++) casos.anios.push(a);
 for (let i = 0; i < 60; i++) casos.habiles.push([`2026-${String(1 + (i % 12)).padStart(2, '0')}-1${i % 9}`, (i % 15) - 5]);
@@ -74,5 +115,9 @@ eq(r.fmt, nums.map((n) => A.formatearPesos(n)), 'python = js (formato)');
 eq(r.feriados, casos.anios.map((a) => A.feriados(a)), 'python = js (feriados 2000-2060)');
 eq(r.cbu, casos.cbus.map((c) => A.analizarCbu(c)), 'python = js (cbu)');
 eq(r.habiles, casos.habiles.map(([f, n]) => A.sumarDiasHabiles(f, n)), 'python = js (hábiles)');
+eq(r.liq, casos.liq.map((c) => A.liquidacionDespido({ ingreso: c.ingreso, egreso: c.egreso, sueldo: c.sueldo, topeConvenio: c.tope, conPreaviso: c.pre })), 'python = js (liquidación)');
+eq(r.vac, casos.vac.map((c) => A.vacaciones(c.sueldo, c.ingreso, c.anio)), 'python = js (vacaciones)');
+eq(r.neto, casos.neto.map((c) => A.sueldoNeto(c.b, { tope: c.tope, sindicato: c.sin })), 'python = js (neto)');
+eq(r.sac, casos.sac.map((c) => A.aguinaldo(c.s, { anio: c.anio, semestre: c.sem, ingreso: c.ingreso, egreso: c.egreso })), 'python = js (aguinaldo)');
 console.log(fallas ? `${fallas} de ${total} pruebas fallaron` : `${total} pruebas, 0 fallas`);
 process.exit(fallas ? 1 : 0);

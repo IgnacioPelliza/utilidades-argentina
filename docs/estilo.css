@@ -1,0 +1,19 @@
+
+:root{--fondo:#f5f6f8;--tarjeta:#fff;--texto:#1d2330;--suave:#667085;--borde:#e3e6eb;--acento:#1F3A3D;--ok:#1e8a4c;--okf:#e3f6eb;--mal:#c0392b;--malf:#fde8e5}
+@media (prefers-color-scheme:dark){:root{--fondo:#0f1418;--tarjeta:#182027;--texto:#e8edf2;--suave:#9aa6b2;--borde:#2a343d;--acento:#7cc4b8;--okf:#123824;--malf:#3b1714;--ok:#5fd394;--mal:#ff8a7a}}
+*{box-sizing:border-box}body{margin:0;background:var(--fondo);color:var(--texto);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:24px 16px 60px}h1{font-size:1.7rem;margin:.2em 0}h2{font-size:1.15rem;margin:0 0 .6em}
+.sub{color:var(--suave);margin:0 0 20px}.tarjeta{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:18px;margin:14px 0}
+label{display:block;font-size:.9rem;color:var(--suave);margin:.4em 0 .2em}input,select{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--borde);border-radius:10px;background:var(--fondo);color:var(--texto)}
+.fila{display:flex;gap:10px;flex-wrap:wrap}.fila>*{flex:1 1 160px}
+.res{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--fondo);min-height:1.5em;word-break:break-word}
+.res.ok{background:var(--okf);color:var(--ok)}.res.mal{background:var(--malf);color:var(--mal)}
+button{font:inherit;padding:8px 14px;border-radius:10px;border:1px solid var(--borde);background:var(--tarjeta);color:var(--texto);cursor:pointer;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:.95rem}td{padding:6px 4px;border-bottom:1px solid var(--borde)}td:first-child{white-space:nowrap;color:var(--suave);width:9em}
+.pasado{opacity:.45}.prox{font-weight:700}footer{color:var(--suave);font-size:.9rem;text-align:center;margin-top:30px}a{color:var(--acento)}
+.cafe{background:var(--acento);color:#fff;border-radius:14px;padding:14px;text-align:center}@media (prefers-color-scheme:dark){.cafe{color:#0f1418}}
+
+nav{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}nav a{padding:6px 10px;border:1px solid var(--borde);border-radius:999px;text-decoration:none;font-size:.9rem;background:var(--tarjeta)}
+nav a.activo{background:var(--acento);color:#fff;border-color:var(--acento)}@media (prefers-color-scheme:dark){nav a.activo{color:#0f1418}}
+.total{font-size:1.4rem;font-weight:800}.detalle td:last-child{text-align:right;white-space:nowrap}.detalle td:first-child{color:var(--texto);width:auto;white-space:normal}
+.detalle small{display:block;color:var(--suave)}.explica{color:var(--suave);font-size:.95rem}.explica h2{color:var(--texto)}

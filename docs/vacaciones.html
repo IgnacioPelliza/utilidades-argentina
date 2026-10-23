@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calculadora de vacaciones 2026: cuántos días te tocan y cuánto cobrás</title>
+<meta name="description" content="Calculá cuántos días de vacaciones te corresponden según tu antigüedad y cuánto cobrás (sueldo dividido 25). Ley de Contrato de Trabajo. Gratis y sin publicidad.">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body><main>
+<nav><a href="index.html">CUIT, CBU, letras y feriados</a><a href="aguinaldo.html">Aguinaldo</a><a href="vacaciones.html" class="activo">Vacaciones</a><a href="sueldo-neto.html">Sueldo neto</a><a href="indemnizacion.html">Indemnización</a></nav>
+<h1>Calculadora de vacaciones 🏖️</h1>
+<p class="sub">Cuántos días te tocan y cuánto cobrás.</p>
+<section class="tarjeta">
+<label for="s">Tu sueldo bruto mensual</label><input id="s" inputmode="decimal" placeholder="1.200.000">
+<div class="fila"><div><label for="ing">Fecha en que entraste a trabajar</label><input id="ing" type="date"></div>
+<div><label for="anio">Vacaciones del año</label><select id="anio"></select></div></div>
+<div class="res" id="res">—</div>
+<p class="sub" style="font-size:.85rem;margin-top:10px">Es una estimación con la Ley de Contrato de Trabajo y los cambios de la Ley 27.802 (2026). Tu convenio colectivo puede cambiar el resultado: confirmalo con un contador o un abogado laboral.</p>
+</section>
+<section class="tarjeta explica">
+<h2>¿Cuántos días de vacaciones me corresponden?</h2>
+<table><tr><td>Menos de 5 años</td><td>14 días corridos</td></tr><tr><td>De 5 a 10 años</td><td>21 días corridos</td></tr><tr><td>De 10 a 20 años</td><td>28 días corridos</td></tr><tr><td>Más de 20 años</td><td>35 días corridos</td></tr></table>
+<p>La antigüedad se cuenta al 31 de diciembre del año de las vacaciones. Si entraste ese año y no trabajaste al menos la mitad de los días hábiles, te toca 1 día por cada 20 trabajados.</p>
+<h2>¿Cuánto se cobra?</h2>
+<p>Si cobrás por mes, cada día de vacaciones se paga <b>sueldo ÷ 25</b> (no ÷ 30), por eso las vacaciones pagan un poco más que un mes normal. Se cobran antes de salir.</p>
+<p>Desde la Ley 27.802 (2026) se pueden partir en tramos de al menos 7 días si lo acuerdan, y el aviso tiene que llegar por escrito con 30 días de anticipación (salvo que tu convenio diga otra cosa).</p>
+</section>
+<div class="cafe">¿Te sirvió? Invitame un café ☕ · Alias: <b>igna.pelliza</b></div>
+<footer>Gratis, sin publicidad y sin guardar nada: todo se calcula en tu navegador.<br>Código abierto (MIT) en <a href="https://github.com/IgnacioPelliza/utilidades-argentina">GitHub</a> · Hecho en San Juan por Ignacio Pelliza</footer>
+</main>
+<script src="argentina.js"></script>
+<script>
+const A = window.Argentina, $ = (id) => document.getElementById(id), P = (n) => A.formatearPesos(n);
+const num = (id) => { const v = $(id).value.trim(); if (!v) return NaN; return v.includes(',') || /\.\d{3}/.test(v) ? A.leerPesos(v) : Number(v); };
+const hoyIso = (() => { const h = new Date(); return `${h.getFullYear()}-${String(h.getMonth() + 1).padStart(2, '0')}-${String(h.getDate()).padStart(2, '0')}`; })();
+const tabla = (filas) => '<table class="detalle">' + filas.map(([a, b, n]) => `<tr><td>${a}${n ? `<small>${n}</small>` : ''}</td><td>${b}</td></tr>`).join('') + '</table>';
+
+const y = new Date().getFullYear(); for (let a = y - 1; a <= y + 1; a++) $('anio').add(new Option(a, a, false, a === y));
+function calcular() {
+  const s = num('s'), ing = $('ing').value;
+  if (!ing) { $('res').className = 'res'; $('res').textContent = 'Poné la fecha en que entraste a trabajar.'; return; }
+  if (ing > $('anio').value + '-12-31') { $('res').className = 'res mal'; $('res').textContent = 'Todavía no habías entrado ese año.'; return; }
+  const r = A.vacaciones(s > 0 ? s : 0, ing, +$('anio').value);
+  $('res').className = 'res ok';
+  $('res').innerHTML = `<div class="total">${r.dias} días corridos</div>` + (r.proporcional ? `Como entraste ese año y no llegaste a trabajar la mitad de los días hábiles, te toca 1 día cada 20 trabajados (${r.habilesTrabajados} días hábiles).` : `Antigüedad al 31/12: ${r.antiguedadAnios} ${r.antiguedadAnios === 1 ? 'año' : 'años'}.`)
+    + (s > 0 ? `<br>Cobrás <b>${P(r.monto)}</b> brutos por las vacaciones (${P(r.porDia)} por día). <small>Comparado con un mes normal, son ${P(r.plus)} más ("plus vacacional").</small>` : '<br><small>Poné tu sueldo para ver cuánto cobrás.</small>');
+}
+document.querySelectorAll('input,select').forEach((e) => e.addEventListener('input', calcular)); calcular();
+</script>
+</body></html>
