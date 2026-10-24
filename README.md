@@ -4,6 +4,10 @@ Hola, soy Ignacio, de San Juan. Acá junté cosas que en Argentina se usan segui
 
 Si no programás, usalas directo desde la web:
 
+- [Aumento de alquiler por IPC o ICL](https://ignaciopelliza.github.io/utilidades-argentina/alquiler.html): cuánto pagás hoy, cuándo es el próximo aumento, qué meses se toman, y el mensaje armado para mandar por WhatsApp
+- [Cuánto aumentan los alquileres este mes](https://ignaciopelliza.github.io/utilidades-argentina/aumentos.html) (se actualiza sola cuando sale el IPC)
+- [Actualizar un monto por inflación](https://ignaciopelliza.github.io/utilidades-argentina/inflacion.html)
+- [¿Cuotas o contado?](https://ignaciopelliza.github.io/utilidades-argentina/cuotas.html)
 - [CUIT, CBU, número a letras y feriados](https://ignaciopelliza.github.io/utilidades-argentina/)
 - [Aguinaldo](https://ignaciopelliza.github.io/utilidades-argentina/aguinaldo.html)
 - [Vacaciones](https://ignaciopelliza.github.io/utilidades-argentina/vacaciones.html)
@@ -14,7 +18,7 @@ Todo se calcula en tu navegador. No se guarda ni se envía nada.
 
 ## Para programadores
 
-Hay una versión en JavaScript (`src/argentina.js`, anda en el navegador y en Node) y otra en Python (`python/argentina.py`). No necesitan instalar nada: copiás el archivo y listo. Las dos dan exactamente lo mismo; las pruebas lo comparan con miles de casos (`node pruebas/test.js`).
+Hay una versión en JavaScript (`src/argentina.js`, anda en el navegador y en Node) y otra en Python (`python/argentina.py`). No necesitan instalar nada: copiás el archivo y listo. Las dos dan exactamente lo mismo; las pruebas lo comparan con miles de casos (`node pruebas/test.js` y `node pruebas/test-alquiler.js`, que verifica los aumentos de noviembre 2026 publicados por El Cronista y ejemplos de ICL).
 
 JavaScript:
 
@@ -34,6 +38,19 @@ A.sueldoNeto(1500000, { sindicato: 2 });
 A.liquidacionDespido({ ingreso: '2020-03-15', egreso: '2026-10-23', sueldo: 1200000 });
 ```
 
+Alquiler e inflación (`src/alquiler.js`, usa los datos de `docs/datos/indices.json`):
+
+```js
+const Q = require('./src/alquiler.js'), datos = require('./docs/datos/indices.json');
+Q.ajustesContrato({ inicio: '2025-11-01', monto: 500000, frecuencia: 3, indice: 'ipc', criterio: 'publicado' }, datos);
+// { montoVigente, proximo: { fecha: '2026-11-01', porcentaje: 5.81..., monto, meses: [...] }, ajustes: [...] }
+Q.mesesIPC('2026-11-01', 3, 'publicado', datos);   // ['2026-07', '2026-08', '2026-09']
+Q.actualizarPorInflacion(100000, '2025-12', '2026-09', datos);
+Q.cuotasVsContado({ contado: 300000, cuotas: 6, valorCuota: 50000, inflacionMensual: 1.9 });
+```
+
+Los índices se bajan solos todos los días con una GitHub Action (`.github/workflows/indices.yml`): IPC del INDEC (vía ArgentinaDatos, cruzado con datos.gob.ar) e ICL del Banco Central (API v4.0, variable 40). Si las fuentes no coinciden o cambia un dato viejo, no se publica nada y la Action falla para avisar.
+
 Python:
 
 ```python
@@ -48,6 +65,7 @@ A.liquidacion_despido("2020-03-15", "2026-10-23", 1200000)
 
 - El CUIL que sale del DNI es el cálculo de siempre, pero el número oficial lo da ANSES/ARCA.
 - Validar un CBU sirve para detectar errores de tipeo. No dice si la cuenta existe ni de quién es.
+- Los aumentos de alquiler son orientativos: lo que vale es lo que dice cada contrato (qué índice, qué meses y cada cuánto).
 - Los feriados salen de la Ley 27.399. No incluyen los días no laborables ni los provinciales, y a veces el Gobierno mueve alguno por decreto.
 - Las calculadoras de sueldo usan la Ley de Contrato de Trabajo con los cambios de la Ley 27.802 (2026). Son una estimación: tu convenio puede cambiar el resultado. Para un caso real, consultalo con un contador o un abogado laboral.
 

@@ -1,0 +1,31 @@
+name: Actualizar índices
+
+on:
+  schedule:
+    - cron: "30 10 * * *"   # 7:30 de Argentina
+    - cron: "45 19 * * *"   # 16:45 de Argentina (el INDEC publica el IPC a las 16 h)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Bajar y validar IPC e ICL
+        run: python3 scripts/actualizar_indices.py
+      - name: Armar la tabla del mes
+        run: cp src/alquiler.js docs/alquiler.js && node scripts/generar-aumentos.js
+      - name: Pruebas (si fallan, no se publica nada)
+        run: node pruebas/test-alquiler.js && node pruebas/test.js
+      - name: Guardar si hubo cambios
+        run: |
+          git config user.name "Ignacio Pelliza"
+          git config user.email "ignape83@gmail.com"
+          git add docs
+          git diff --cached --quiet || (git commit -m "Índices actualizados" && git push)

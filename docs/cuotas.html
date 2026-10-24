@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>¿Cuotas o contado? Calculadora con inflación (Argentina)</title>
+<meta name="description" content="Calculá si te conviene pagar en cuotas o de contado descontando la inflación. Gratis y sin publicidad.">
+<link rel="canonical" href="https://ignaciopelliza.github.io/utilidades-argentina/cuotas.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_AR">
+<meta property="og:title" content="¿Cuotas o contado? Calculadora con inflación (Argentina)">
+<meta property="og:description" content="Calculá si te conviene pagar en cuotas o de contado descontando la inflación. Gratis y sin publicidad.">
+<meta property="og:url" content="https://ignaciopelliza.github.io/utilidades-argentina/cuotas.html">
+<meta property="og:image" content="https://ignaciopelliza.github.io/utilidades-argentina/compartir-alquiler.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body><main>
+<nav><a href="alquiler.html">Alquiler</a><a href="aumentos.html">Aumentos del mes</a><a href="inflacion.html">Inflación</a><a href="cuotas.html" class="activo">Cuotas o contado</a><a href="aguinaldo.html">Aguinaldo</a><a href="vacaciones.html">Vacaciones</a><a href="sueldo-neto.html">Sueldo neto</a><a href="indemnizacion.html">Indemnización</a><a href="index.html">CUIT, CBU y feriados</a></nav>
+<h1>¿Me conviene pagar en cuotas o de contado?</h1>
+<p class="sub">Compara el precio de contado con lo que valen hoy las cuotas, descontando la inflación.</p>
+<section class="tarjeta">
+<div class="fila"><div><label for="contado">Precio de contado</label><input id="contado" inputmode="decimal" placeholder="300.000"></div>
+<div><label for="n">Cantidad de cuotas</label><input id="n" inputmode="numeric" placeholder="6"></div>
+<div><label for="cuota">Valor de cada cuota</label><input id="cuota" inputmode="decimal" placeholder="55.000"></div></div>
+<div class="fila"><div><label for="inf">Inflación que esperás por mes (%)</label><input id="inf" inputmode="decimal"></div>
+<div><label for="primera">La primera cuota se paga</label><select id="primera"><option value="no">El mes que viene</option><option value="si">Hoy</option></select></div></div>
+<div id="res" class="res">Completá los datos.</div>
+<div class="acciones"><button type="button" id="b-copiar">Copiar resultado</button></div>
+<p class="suave chico" id="fuentes"></p>
+</section>
+<section class="tarjeta explica">
+<h2>¿Cómo se calcula?</h2>
+<p>Con inflación, una cuota que pagás dentro de unos meses vale menos que la misma plata hoy. Por eso cada cuota se "trae a hoy" dividiéndola por la inflación acumulada hasta el mes en que la pagás, y la suma se compara con el precio de contado.</p>
+<p>Si la suma da menos que el contado, conviene pagar en cuotas (y mientras tanto la plata la podés tener en algo que rinda). Si da más, conviene el contado o pedir descuento. La inflación que se viene nadie la sabe: por defecto ponemos la última publicada, y la podés cambiar.</p>
+</section>
+<div class="cafe" id="cafe">Este sitio es gratis y no tiene publicidad. Mantenerlo al día lleva horas cada mes, cuando sale el IPC.<br>Si te sirvió y querés colaborar, mi alias es<br><b style="font-size:1.2em">igna.pelliza</b><br><button type="button" class="boton-claro" data-copiar="igna.pelliza">Copiar alias</button></div>
+<footer>El código está en <a href="https://github.com/IgnacioPelliza/utilidades-argentina">GitHub</a>. Lo hice yo, Ignacio Pelliza, desde San Juan.<br>No guardo ni envío tus datos: todo se calcula en tu navegador.</footer>
+</main>
+<script src="argentina.js"></script>
+<script src="alquiler.js"></script>
+<script src="datos.js"></script>
+<script>
+const A = window.Alquiler, D = window.Datos, $ = (id) => document.getElementById(id);
+let datos;
+function calcular() {
+  const c = D.numero($('contado').value), n = Math.round(D.numero($('n').value)), q = D.numero($('cuota').value), i = Number(String($('inf').value).replace(',', '.'));
+  D.escribirLink({ c: $('contado').value.trim(), n: $('n').value.trim(), q: $('cuota').value.trim(), i: $('inf').value.trim(), p: $('primera').value });
+  if (!(c > 0) || !(n >= 1) || !(q > 0) || !(i >= 0)) { $('res').className = 'res'; $('res').textContent = 'Completá los datos.'; return; }
+  const r = A.cuotasVsContado({ contado: c, cuotas: n, valorCuota: q, inflacionMensual: i, primeraHoy: $('primera').value === 'si' });
+  const titulo = r.conviene === 'cuotas' ? 'Conviene pagar en cuotas' : r.conviene === 'contado' ? 'Conviene pagar de contado' : 'Da lo mismo';
+  $('res').className = 'res ' + (r.conviene === 'contado' ? 'mal' : 'ok');
+  $('res').innerHTML = `<div class="total">${titulo}</div>En cuotas pagás ${D.fmt(r.totalCuotas, 0)} en total (${Math.abs(r.recargo) < 0.05 ? 'lo mismo que de contado, sin recargo' : r.recargo > 0 ? D.pct(r.recargo, 1) + ' más que de contado' : D.pct(-r.recargo, 1) + ' menos que de contado'}).<br>Descontando ${String(i).replace('.', ',')}% de inflación por mes, esas cuotas valen hoy <b>${D.fmt(r.valorHoy, 0)}</b>, ${r.diferencia >= 0 ? D.fmt(r.diferencia, 0) + ' menos' : D.fmt(-r.diferencia, 0) + ' más'} que el contado.`;
+}
+$('b-copiar').addEventListener('click', (e) => D.copiar($('res').textContent + ' ' + location.href, e.target));
+D.cargar().then((d) => {
+  datos = d; const L = D.leerLink(), u = A.ultimoIPC(d);
+  $('contado').value = L.c || ''; $('n').value = L.n || ''; $('cuota').value = L.q || ''; $('primera').value = L.p || 'no';
+  $('inf').value = L.i || String(d.ipc[u]).replace('.', ',');
+  $('fuentes').textContent = `Inflación por defecto: la última publicada por el INDEC (${A.nombreMes(u, true)}).`;
+  document.querySelectorAll('input,select').forEach((el) => el.addEventListener('input', calcular)); calcular();
+});
+
+</script>
+</body></html>

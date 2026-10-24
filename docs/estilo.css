@@ -17,3 +17,9 @@ nav{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}nav a{padding:6px 10px;b
 nav a.activo{background:var(--acento);color:#fff;border-color:var(--acento)}@media (prefers-color-scheme:dark){nav a.activo{color:#0f1418}}
 .total{font-size:1.4rem;font-weight:800}.detalle td:last-child{text-align:right;white-space:nowrap}.detalle td:first-child{color:var(--texto);width:auto;white-space:normal}
 .detalle small{display:block;color:var(--suave)}.explica{color:var(--suave);font-size:.95rem}.explica h2{color:var(--texto)}
+.suave{color:var(--suave)}.chico{font-size:.85rem}.aviso{font-size:.85rem;color:var(--suave);margin:12px 0 0;padding:10px 12px;border-left:3px solid var(--borde)}
+label.opcion{display:flex;gap:8px;align-items:baseline;color:var(--texto);font-size:.95rem;margin:.3em 0}label.opcion input{width:auto}
+.acciones{display:flex;gap:8px;flex-wrap:wrap}.acciones button{margin-top:10px}
+.boton-wa{background:#1f8f55;color:#fff;border-color:#1f8f55;font-weight:700}.boton-claro{background:#fff;color:#1F3A3D;border-color:#fff;font-weight:700}
+.prox td{font-weight:700}.prox td small{font-weight:400}
+@media print{nav,.acciones,.cafe,footer,.explica,#bloque-crit,label,input,select{display:none!important}.tarjeta{border:0;padding:0}body{background:#fff;color:#000}.res{background:none!important;color:#000!important}}

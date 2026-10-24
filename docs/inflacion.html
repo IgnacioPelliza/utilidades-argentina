@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calculadora de inflación: actualizar un monto por IPC (Argentina)</title>
+<meta name="description" content="Actualizá cualquier monto por inflación con el IPC del INDEC: cuánto valen hoy unos pesos de otra fecha. Gratis y sin publicidad.">
+<link rel="canonical" href="https://ignaciopelliza.github.io/utilidades-argentina/inflacion.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_AR">
+<meta property="og:title" content="Calculadora de inflación: actualizar un monto por IPC (Argentina)">
+<meta property="og:description" content="Actualizá cualquier monto por inflación con el IPC del INDEC: cuánto valen hoy unos pesos de otra fecha. Gratis y sin publicidad.">
+<meta property="og:url" content="https://ignaciopelliza.github.io/utilidades-argentina/inflacion.html">
+<meta property="og:image" content="https://ignaciopelliza.github.io/utilidades-argentina/compartir-alquiler.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body><main>
+<nav><a href="alquiler.html">Alquiler</a><a href="aumentos.html">Aumentos del mes</a><a href="inflacion.html" class="activo">Inflación</a><a href="cuotas.html">Cuotas o contado</a><a href="aguinaldo.html">Aguinaldo</a><a href="vacaciones.html">Vacaciones</a><a href="sueldo-neto.html">Sueldo neto</a><a href="indemnizacion.html">Indemnización</a><a href="index.html">CUIT, CBU y feriados</a></nav>
+<h1>Actualizar un monto por inflación</h1>
+<p class="sub">Cuánto valen hoy unos pesos de otra fecha, con el IPC del INDEC.</p>
+<section class="tarjeta">
+<label for="monto">Monto</label><input id="monto" inputmode="decimal" placeholder="100.000">
+<div class="fila"><div><label for="dm">De</label><div class="fila"><select id="dm"></select><select id="da"></select></div></div>
+<div><label for="hm">A</label><div class="fila"><select id="hm"></select><select id="ha"></select></div></div></div>
+<div id="res" class="res">Poné un monto.</div>
+<div class="acciones"><button type="button" id="b-copiar">Copiar resultado</button></div>
+<p class="suave chico" id="fuentes"></p>
+</section>
+<section class="tarjeta explica">
+<h2>¿Cómo se calcula?</h2>
+<p>Se multiplican las inflaciones mensuales desde el mes siguiente al de origen hasta el mes de destino. Por ejemplo, $100.000 de diciembre de 2025 llevados a septiembre de 2026 se multiplican por la inflación de enero a septiembre de 2026.</p>
+<p>Sirve para saber cuánto perdió tu sueldo, si un aumento le ganó a la inflación o cuánto vale hoy una deuda vieja. No es una tasa de interés ni una actualización judicial.</p>
+</section>
+<div class="cafe" id="cafe">Este sitio es gratis y no tiene publicidad. Mantenerlo al día lleva horas cada mes, cuando sale el IPC.<br>Si te sirvió y querés colaborar, mi alias es<br><b style="font-size:1.2em">igna.pelliza</b><br><button type="button" class="boton-claro" data-copiar="igna.pelliza">Copiar alias</button></div>
+<footer>El código está en <a href="https://github.com/IgnacioPelliza/utilidades-argentina">GitHub</a>. Lo hice yo, Ignacio Pelliza, desde San Juan.<br>No guardo ni envío tus datos: todo se calcula en tu navegador.</footer>
+</main>
+<script src="argentina.js"></script>
+<script src="alquiler.js"></script>
+<script src="datos.js"></script>
+<script>
+const A = window.Alquiler, D = window.Datos, $ = (id) => document.getElementById(id);
+let datos;
+const MES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+function opciones(datos) {
+  const ult = A.ultimoIPC(datos), L = D.leerLink();
+  for (const id of ['dm', 'hm']) { $(id).innerHTML = MES.map((m, i) => `<option value="${String(i + 1).padStart(2, '0')}">${m}</option>`).join(''); }
+  for (const id of ['da', 'ha']) { let s = ''; for (let a = +ult.slice(0, 4); a >= 2000; a--) s += `<option>${a}</option>`; $(id).innerHTML = s; }
+  const de = L.de || A.sumarMeses(ult, -12), a = L.a || ult;
+  $('dm').value = de.slice(5, 7); $('da').value = de.slice(0, 4); $('hm').value = a.slice(5, 7); $('ha').value = a.slice(0, 4); if (L.m) $('monto').value = L.m;
+}
+function calcular() {
+  const m = D.numero($('monto').value), de = $('da').value + '-' + $('dm').value, a = $('ha').value + '-' + $('hm').value;
+  D.escribirLink({ m: $('monto').value.trim(), de, a }); $('fuentes').textContent = D.fuentes(datos);
+  if (!(m > 0)) { $('res').className = 'res'; $('res').textContent = 'Poné un monto.'; return; }
+  const r = A.actualizarPorInflacion(m, de, a, datos);
+  if (r.error) { $('res').className = 'res mal'; $('res').textContent = r.error; return; }
+  $('res').className = 'res ok';
+  $('res').innerHTML = `<div class="total">${D.fmt(r.resultado, 2)}</div>${D.fmt(m, 2)} de ${A.nombreMes(de, true)} equivalen a ${D.fmt(r.resultado, 2)} en ${A.nombreMes(a, true)}.<br>Inflación del período: <b>${D.pct(r.porcentaje, 1)}</b>.`;
+}
+$('b-copiar').addEventListener('click', (e) => D.copiar($('res').textContent + ' ' + location.href, e.target));
+D.cargar().then((d) => { datos = d; opciones(d); calcular(); document.querySelectorAll('input,select').forEach((el) => el.addEventListener('input', calcular)); });
+
+</script>
+</body></html>
