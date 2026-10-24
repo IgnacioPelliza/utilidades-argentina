@@ -290,4 +290,15 @@ for f in ["index.html", "aguinaldo.html", "vacaciones.html", "sueldo-neto.html",
     s = open(f, encoding="utf-8").read()
     s = re.sub(r"<nav>.*?</nav>", nav(f), s, flags=re.S)
     open(f, "w", encoding="utf-8").write(s)
+# Franja de apoyo arriba de todas las páginas y estilos sin caché vieja
+import glob as _g
+APOYO = '<div class="apoyo"><span>Gratis y sin publicidad. Si te sirve, podés bancarlo.</span><div class="botones"><a href="https://mpago.la/1ZRrR5b" target="_blank" rel="noopener">Aportar todos los meses</a><button type="button" data-copiar="igna.pelliza">Copiar alias igna.pelliza</button></div></div>'
+for f in _g.glob("*.html"):
+    if f.startswith("google"): continue
+    t = open(f, encoding="utf-8").read()
+    t = re.sub(r'<div class="apoyo">.*?</div></div>', "", t, flags=re.S)
+    t = re.sub(r'(<p class="sub">.*?</p>)', lambda m: m.group(1) + "\n" + APOYO, t, count=1, flags=re.S)
+    t = re.sub(r'href="estilo\.css(\?v=\d+)?"', 'href="estilo.css?v=3"', t)
+    if "datos.js" not in t: t = t.replace("</body>", '<script src="datos.js"></script>\n</body>')
+    open(f, "w", encoding="utf-8").write(t)
 print("ok")

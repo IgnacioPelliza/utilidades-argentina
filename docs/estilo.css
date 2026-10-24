@@ -24,3 +24,10 @@ label.opcion{display:flex;gap:8px;align-items:baseline;color:var(--texto);font-s
 .prox td{font-weight:700}.prox td small{font-weight:400}
 @media print{nav,.acciones,.cafe,footer,.explica,#bloque-crit,label,input,select{display:none!important}.tarjeta{border:0;padding:0}body{background:#fff;color:#000}.res{background:none!important;color:#000!important}}
 a.boton-link{display:inline-block;padding:8px 14px;border-radius:10px;text-decoration:none;margin-top:8px;border:1px solid #fff}
+a.boton-claro,a.boton-claro:visited{background:#fff;color:#1F3A3D;border:1px solid #fff;font-weight:700;text-decoration:none;display:inline-block;padding:8px 14px;border-radius:10px;margin-top:8px}
+.apoyo{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between;background:var(--tarjeta);border:1px solid var(--acento);border-radius:12px;padding:10px 12px;margin:0 0 14px;font-size:.92rem}
+.apoyo span{flex:1 1 220px}.apoyo .botones{display:flex;gap:8px;flex-wrap:wrap}
+.apoyo a,.apoyo button{margin:0;padding:7px 12px;border-radius:10px;font-weight:700;font-size:.9rem;text-decoration:none;cursor:pointer}
+.apoyo a{background:var(--acento);color:#fff;border:1px solid var(--acento)}@media (prefers-color-scheme:dark){.apoyo a{color:#0f1418}}
+.apoyo button{background:transparent;color:var(--texto);border:1px solid var(--borde)}
+@media print{.apoyo{display:none!important}}
