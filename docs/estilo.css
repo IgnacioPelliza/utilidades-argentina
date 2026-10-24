@@ -23,3 +23,4 @@ label.opcion{display:flex;gap:8px;align-items:baseline;color:var(--texto);font-s
 .boton-wa{background:#1f8f55;color:#fff;border-color:#1f8f55;font-weight:700}.boton-claro{background:#fff;color:#1F3A3D;border-color:#fff;font-weight:700}
 .prox td{font-weight:700}.prox td small{font-weight:400}
 @media print{nav,.acciones,.cafe,footer,.explica,#bloque-crit,label,input,select{display:none!important}.tarjeta{border:0;padding:0}body{background:#fff;color:#000}.res{background:none!important;color:#000!important}}
+a.boton-link{display:inline-block;padding:8px 14px;border-radius:10px;text-decoration:none;margin-top:8px;border:1px solid #fff}

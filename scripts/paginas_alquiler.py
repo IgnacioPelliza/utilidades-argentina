@@ -12,7 +12,7 @@ NAV = [("alquiler.html", "Alquiler"), ("aumentos.html", "Aumentos del mes"), ("i
 def nav(activo):
     return "<nav>" + "".join('<a href="%s"%s>%s</a>' % (h, ' class="activo"' if h == activo else "", t) for h, t in NAV) + "</nav>"
 
-PIE = '''<div class="cafe" id="cafe">Este sitio es gratis y no tiene publicidad. Mantenerlo al día lleva horas cada mes, cuando sale el IPC.<br>Si te sirvió y querés colaborar, mi alias es<br><b style="font-size:1.2em">igna.pelliza</b><br><button type="button" class="boton-claro" data-copiar="igna.pelliza">Copiar alias</button></div>
+PIE = '''<div class="cafe" id="cafe">Este sitio es gratis y no tiene publicidad. Mantenerlo al día lleva horas cada mes, cuando sale el IPC.<br>Si te sirvió y querés colaborar, mi alias es<br><b style="font-size:1.2em">igna.pelliza</b><br><button type="button" class="boton-claro" data-copiar="igna.pelliza">Copiar alias</button> <a class="boton-claro boton-link" href="https://mpago.la/1ZRrR5b" target="_blank" rel="noopener">Aportar todos los meses</a></div>
 <footer>El código está en <a href="https://github.com/IgnacioPelliza/utilidades-argentina">GitHub</a>. Lo hice yo, Ignacio Pelliza, desde San Juan.<br>No guardo ni envío tus datos: todo se calcula en tu navegador.</footer>'''
 
 AVISO = '''<p class="aviso">Cálculo orientativo con datos del INDEC y del Banco Central. Lo que vale es lo que dice tu contrato: qué índice, qué meses y cada cuánto. No es asesoramiento legal. Si encontrás un error, <a href="https://github.com/IgnacioPelliza/utilidades-argentina/issues">avisame</a> y lo corrijo.</p>'''
