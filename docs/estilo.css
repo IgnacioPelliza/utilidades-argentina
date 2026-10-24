@@ -31,3 +31,4 @@ a.boton-claro,a.boton-claro:visited{background:#fff;color:#1F3A3D;border:1px sol
 .apoyo a{background:var(--acento);color:#fff;border:1px solid var(--acento)}@media (prefers-color-scheme:dark){.apoyo a{color:#0f1418}}
 .apoyo button{background:transparent;color:var(--texto);border:1px solid var(--borde)}
 @media print{.apoyo{display:none!important}}
+.en-play .apoyo,.en-play .cafe{display:none!important}

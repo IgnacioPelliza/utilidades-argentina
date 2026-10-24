@@ -44,6 +44,17 @@
   const escribirLink = (o) => history.replaceState(null, '', '#' + new URLSearchParams(Object.entries(o).filter(([, v]) => v !== '' && v != null)).toString());
   const numero = (v) => { v = String(v || '').trim(); if (!v) return NaN; return v.includes(',') || /\.\d{3}/.test(v) ? window.Argentina.leerPesos(v) : Number(v); };
 
+  // Dentro de la app de Google Play no se muestran los pedidos de aporte (las reglas de Play no permiten links de pago externos)
+  try {
+    if (document.referrer.startsWith('android-app://')) sessionStorage.setItem('enPlay', '1');
+    if (sessionStorage.getItem('enPlay') === '1') document.documentElement.classList.add('en-play');
+  } catch (e) { /* sin almacenamiento: se muestra normal */ }
+  // Si cambia el link (#...) con la página abierta, se vuelve a cargar con los datos nuevos
+  window.addEventListener('hashchange', () => location.reload());
+
+  // Para que se pueda instalar como app y ande sin internet
+  if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWorker.register('sw.js').catch(() => {});
+
   window.Datos = { cargar, fuentes, fmt, pct, fechaAR, copiar, leerLink, escribirLink, numero };
 
   // Botón "copiar alias" del pie

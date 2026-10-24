@@ -13,7 +13,7 @@ def nav(activo):
     return "<nav>" + "".join('<a href="%s"%s>%s</a>' % (h, ' class="activo"' if h == activo else "", t) for h, t in NAV) + "</nav>"
 
 PIE = '''<div class="cafe" id="cafe">Este sitio es gratis y no tiene publicidad. Mantenerlo al día lleva horas cada mes, cuando sale el IPC.<br>Si te sirvió y querés colaborar, mi alias es<br><b style="font-size:1.2em">igna.pelliza</b><br><button type="button" class="boton-claro" data-copiar="igna.pelliza">Copiar alias</button> <a class="boton-claro boton-link" href="https://mpago.la/1ZRrR5b" target="_blank" rel="noopener">Aportar todos los meses</a></div>
-<footer>El código está en <a href="https://github.com/IgnacioPelliza/utilidades-argentina">GitHub</a>. Lo hice yo, Ignacio Pelliza, desde San Juan.<br>Tus números no salen de tu navegador. Solo cuento visitas, sin cookies.</footer>'''
+<footer>El código está en <a href="https://github.com/IgnacioPelliza/utilidades-argentina">GitHub</a>. Lo hice yo, Ignacio Pelliza, desde San Juan.<br>Tus números no salen de tu navegador. Solo cuento visitas, sin cookies. <a href="privacidad.html">Privacidad</a>.</footer>'''
 
 AVISO = '''<p class="aviso">Cálculo orientativo con datos del INDEC y del Banco Central. Lo que vale es lo que dice tu contrato: qué índice, qué meses y cada cuánto. No es asesoramiento legal. Si encontrás un error, <a href="https://github.com/IgnacioPelliza/utilidades-argentina/issues">avisame</a> y lo corrijo.</p>'''
 
@@ -302,5 +302,7 @@ for f in _g.glob("*.html"):
     t = re.sub(r'href="estilo\.css(\?v=\d+)?"', 'href="estilo.css?v=3"', t)
     if "datos.js" not in t: t = t.replace("</body>", '<script src="datos.js"></script>\n</body>')
     if "goatcounter" not in t: t = t.replace("</body>", GC + "\n</body>")
+    if 'rel="manifest"' not in t:
+        t = t.replace('<link rel="stylesheet"', '<link rel="manifest" href="manifest.webmanifest">\n<meta name="theme-color" content="#1F3A3D">\n<link rel="icon" href="favicon.png">\n<link rel="apple-touch-icon" href="apple-touch-icon.png">\n<link rel="stylesheet"', 1)
     open(f, "w", encoding="utf-8").write(t)
 print("ok")

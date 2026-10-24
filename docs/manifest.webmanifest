@@ -1,0 +1,24 @@
+{
+  "name": "Calculadoras Argentina: alquiler, aguinaldo e inflación",
+  "short_name": "Calculadoras AR",
+  "description": "Aumento de alquiler por IPC e ICL, aguinaldo, vacaciones, sueldo neto, indemnización, inflación y cuotas. Gratis y sin publicidad.",
+  "lang": "es-AR",
+  "id": "/utilidades-argentina/alquiler.html",
+  "start_url": "/utilidades-argentina/alquiler.html?app=1",
+  "scope": "/utilidades-argentina/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f6f8",
+  "theme_color": "#1F3A3D",
+  "categories": ["finance", "utilities"],
+  "icons": [
+    { "src": "icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Aumentos del mes", "url": "/utilidades-argentina/aumentos.html", "icons": [{ "src": "icono-192.png", "sizes": "192x192" }] },
+    { "name": "Aguinaldo", "url": "/utilidades-argentina/aguinaldo.html", "icons": [{ "src": "icono-192.png", "sizes": "192x192" }] },
+    { "name": "Inflación", "url": "/utilidades-argentina/inflacion.html", "icons": [{ "src": "icono-192.png", "sizes": "192x192" }] }
+  ]
+}
