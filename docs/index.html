@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Validar CUIT y CBU, número a letras y feriados de Argentina · Gratis</title>
+<title>Validar CUIT y CBU, número a letras y feriados de Argentina</title>
 <meta name="description" content="Herramientas gratis para Argentina: validar CUIT/CUIL, sacar el CUIT desde el DNI, validar CBU y CVU, pasar números a letras para recibos y cheques, y feriados nacionales. Funciona sin internet, no guarda nada.">
 <link rel="stylesheet" href="estilo.css">
 </head>
 <body><main>
 <nav><a href="index.html" class="activo">CUIT, CBU, letras y feriados</a><a href="aguinaldo.html">Aguinaldo</a><a href="vacaciones.html">Vacaciones</a><a href="sueldo-neto.html">Sueldo neto</a><a href="indemnizacion.html">Indemnización</a></nav>
-<h1>Herramientas para Argentina 🇦🇷</h1>
-<p class="sub">Gratis y sin publicidad. Todo se calcula en tu navegador: no se envía ni se guarda nada.</p>
+<h1>Herramientas para Argentina</h1>
+<p class="sub">Validar un CUIT o un CBU, pasar un número a letras y ver los feriados. Todo se calcula en tu navegador, no se guarda nada.</p>
 
 <section class="tarjeta" id="cuit">
 <h2>Validar CUIT / CUIL</h2>
@@ -46,8 +46,8 @@
 <p class="sub" style="margin:.6em 0 0;font-size:.85rem">Según la Ley 27.399. No incluye los días no laborables ni los feriados provinciales. El Gobierno a veces cambia un traslado por decreto: confirmá en argentina.gob.ar.</p>
 </section>
 
-<div class="cafe">¿Te sirvió? Invitame un café ☕ · Alias: <b>igna.pelliza</b></div>
-<footer>Gratis, sin publicidad y sin guardar nada: todo se calcula en tu navegador.<br>Código abierto (MIT) en <a href="https://github.com/IgnacioPelliza/utilidades-argentina">GitHub</a> · Hecho en San Juan por Ignacio Pelliza</footer>
+<div class="cafe">Si te sirvió y querés colaborar, mi alias es <b>igna.pelliza</b>. Gracias.</div>
+<footer>El código está en <a href="https://github.com/IgnacioPelliza/utilidades-argentina">GitHub</a>. Lo hice yo, Ignacio Pelliza, desde San Juan.</footer>
 </main>
 <script src="argentina.js"></script>
 <script>
@@ -57,7 +57,7 @@ $('c1').addEventListener('input', (e) => {
   const d = e.target.value.replace(/\D/g, '');
   if (!d) return pinta($('c1r'), 'Escribí un número.');
   if (d.length < 11) return pinta($('c1r'), `Faltan ${11 - d.length} números.`);
-  A.validarCuit(d) ? pinta($('c1r'), '✓ Válido: ' + A.formatearCuit(d), 'ok') : pinta($('c1r'), '✗ No es válido (revisá los números).', 'mal');
+  A.validarCuit(d) ? pinta($('c1r'), 'Válido: ' + A.formatearCuit(d), 'ok') : pinta($('c1r'), 'No es válido, revisá los números.', 'mal');
 });
 const dni = () => { const v = $('c2').value.replace(/\D/g, ''); if (!v) return pinta($('c2r'), '—'); try { pinta($('c2r'), A.cuitDesdeDni(v, $('c3').value), 'ok'); } catch (e) { pinta($('c2r'), e.message, 'mal'); } };
 $('c2').addEventListener('input', dni); $('c3').addEventListener('change', dni);
@@ -65,7 +65,7 @@ $('b1').addEventListener('input', (e) => {
   const d = e.target.value.replace(/\D/g, '');
   if (!d) return pinta($('b1r'), 'Pegá el número para revisar que no tenga errores de tipeo.');
   const r = A.analizarCbu(d);
-  r.valido ? pinta($('b1r'), `✓ ${r.tipo} válido${r.banco ? ' · ' + r.banco : ''}`, 'ok') : pinta($('b1r'), '✗ ' + r.motivo, 'mal');
+  r.valido ? pinta($('b1r'), `${r.tipo} válido${r.banco ? ' · ' + r.banco : ''}`, 'ok') : pinta($('b1r'), r.motivo, 'mal');
 });
 const letras = () => {
   const v = $('n1').value.trim(); if (!v) return pinta($('n1r'), '—');
@@ -73,7 +73,7 @@ const letras = () => {
   catch (e) { pinta($('n1r'), 'Escribí un importe válido.', 'mal'); }
 };
 ['n1', 'n2', 'n3'].forEach((id) => $(id).addEventListener('input', letras));
-$('n1c').addEventListener('click', () => { navigator.clipboard && navigator.clipboard.writeText($('n1r').textContent); $('n1c').textContent = 'Copiado ✓'; setTimeout(() => $('n1c').textContent = 'Copiar', 1500); });
+$('n1c').addEventListener('click', () => { navigator.clipboard && navigator.clipboard.writeText($('n1r').textContent); $('n1c').textContent = 'Copiado'; setTimeout(() => $('n1c').textContent = 'Copiar', 1500); });
 const hoy = new Date(), hoyIso = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
 for (let a = hoy.getFullYear() - 1; a <= hoy.getFullYear() + 3; a++) $('f1').add(new Option(a, a, false, a === hoy.getFullYear()));
 const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
