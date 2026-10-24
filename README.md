@@ -55,7 +55,9 @@ Si encontrás un error, avisame abriendo un Issue.
 
 ## Si te sirvió
 
-Si te ahorró un rato y querés colaborar, mi alias es **igna.pelliza**. Y si sos programador, una estrella al repositorio ayuda a que lo encuentre más gente.
+Si sos programador, una estrella al repositorio ayuda a que lo encuentre más gente. Y si te ahorró un rato y querés colaborar, mi alias es:
+
+**igna.pelliza**
 
 También subí unas [plantillas de Excel gratis](https://github.com/IgnacioPelliza/plantillas-excel-gratis) para llevar gastos, stock, presupuestos y más.
 
