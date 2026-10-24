@@ -36,7 +36,7 @@
 <p>Sirve para saber cuánto perdió tu sueldo, si un aumento le ganó a la inflación o cuánto vale hoy una deuda vieja. No es una tasa de interés ni una actualización judicial.</p>
 </section>
 <div class="cafe" id="cafe">Este sitio es gratis y no tiene publicidad. Mantenerlo al día lleva horas cada mes, cuando sale el IPC.<br>Si te sirvió y querés colaborar, mi alias es<br><b style="font-size:1.2em">igna.pelliza</b><br><button type="button" class="boton-claro" data-copiar="igna.pelliza">Copiar alias</button> <a class="boton-claro boton-link" href="https://mpago.la/1ZRrR5b" target="_blank" rel="noopener">Aportar todos los meses</a></div>
-<footer>El código está en <a href="https://github.com/IgnacioPelliza/utilidades-argentina">GitHub</a>. Lo hice yo, Ignacio Pelliza, desde San Juan.<br>No guardo ni envío tus datos: todo se calcula en tu navegador.</footer>
+<footer>El código está en <a href="https://github.com/IgnacioPelliza/utilidades-argentina">GitHub</a>. Lo hice yo, Ignacio Pelliza, desde San Juan.<br>Tus números no salen de tu navegador. Solo cuento visitas, sin cookies.</footer>
 </main>
 <script src="argentina.js"></script>
 <script src="alquiler.js"></script>
@@ -65,4 +65,5 @@ $('b-copiar').addEventListener('click', (e) => D.copiar($('res').textContent + '
 D.cargar().then((d) => { datos = d; opciones(d); calcular(); document.querySelectorAll('input,select').forEach((el) => el.addEventListener('input', calcular)); });
 
 </script>
+<script data-goatcounter="https://utilidades-argentina.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>

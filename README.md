@@ -14,7 +14,7 @@ Si no programás, usalas directo desde la web:
 - [Sueldo bruto a neto](https://ignaciopelliza.github.io/utilidades-argentina/sueldo-neto.html)
 - [Indemnización por despido](https://ignaciopelliza.github.io/utilidades-argentina/indemnizacion.html)
 
-Todo se calcula en tu navegador. No se guarda ni se envía nada.
+Todo se calcula en tu navegador: tus números no se guardan ni se envían. Solo se cuentan las visitas con GoatCounter, sin cookies.
 
 ## Para programadores
 

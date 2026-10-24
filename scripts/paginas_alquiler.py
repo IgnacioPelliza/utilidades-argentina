@@ -13,7 +13,7 @@ def nav(activo):
     return "<nav>" + "".join('<a href="%s"%s>%s</a>' % (h, ' class="activo"' if h == activo else "", t) for h, t in NAV) + "</nav>"
 
 PIE = '''<div class="cafe" id="cafe">Este sitio es gratis y no tiene publicidad. Mantenerlo al día lleva horas cada mes, cuando sale el IPC.<br>Si te sirvió y querés colaborar, mi alias es<br><b style="font-size:1.2em">igna.pelliza</b><br><button type="button" class="boton-claro" data-copiar="igna.pelliza">Copiar alias</button> <a class="boton-claro boton-link" href="https://mpago.la/1ZRrR5b" target="_blank" rel="noopener">Aportar todos los meses</a></div>
-<footer>El código está en <a href="https://github.com/IgnacioPelliza/utilidades-argentina">GitHub</a>. Lo hice yo, Ignacio Pelliza, desde San Juan.<br>No guardo ni envío tus datos: todo se calcula en tu navegador.</footer>'''
+<footer>El código está en <a href="https://github.com/IgnacioPelliza/utilidades-argentina">GitHub</a>. Lo hice yo, Ignacio Pelliza, desde San Juan.<br>Tus números no salen de tu navegador. Solo cuento visitas, sin cookies.</footer>'''
 
 AVISO = '''<p class="aviso">Cálculo orientativo con datos del INDEC y del Banco Central. Lo que vale es lo que dice tu contrato: qué índice, qué meses y cada cuánto. No es asesoramiento legal. Si encontrás un error, <a href="https://github.com/IgnacioPelliza/utilidades-argentina/issues">avisame</a> y lo corrijo.</p>'''
 
@@ -292,6 +292,7 @@ for f in ["index.html", "aguinaldo.html", "vacaciones.html", "sueldo-neto.html",
     open(f, "w", encoding="utf-8").write(s)
 # Franja de apoyo arriba de todas las páginas y estilos sin caché vieja
 import glob as _g
+GC = '<script data-goatcounter="https://utilidades-argentina.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>'
 APOYO = '<div class="apoyo"><span>Gratis y sin publicidad. Si te sirve, podés bancarlo.</span><div class="botones"><a href="https://mpago.la/1ZRrR5b" target="_blank" rel="noopener">Aportar todos los meses</a><button type="button" data-copiar="igna.pelliza">Copiar alias igna.pelliza</button></div></div>'
 for f in _g.glob("*.html"):
     if f.startswith("google"): continue
@@ -300,5 +301,6 @@ for f in _g.glob("*.html"):
     t = re.sub(r'(<p class="sub">.*?</p>)', lambda m: m.group(1) + "\n" + APOYO, t, count=1, flags=re.S)
     t = re.sub(r'href="estilo\.css(\?v=\d+)?"', 'href="estilo.css?v=3"', t)
     if "datos.js" not in t: t = t.replace("</body>", '<script src="datos.js"></script>\n</body>')
+    if "goatcounter" not in t: t = t.replace("</body>", GC + "\n</body>")
     open(f, "w", encoding="utf-8").write(t)
 print("ok")
