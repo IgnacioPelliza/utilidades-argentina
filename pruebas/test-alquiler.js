@@ -46,7 +46,9 @@ cerca(c.ajustes[0].porcentaje, (1.023 * 1.025 * 1.028 - 1) * 100, 1e-9, 'feb-202
 cerca(c.montoVigente, 500000 * A.acumulado([2.3, 2.5, 2.8, 2.9, 2.9, 3.4, 2.6, 2.1, 1.9]), 1e-6, 'monto vigente encadenado');
 cerca(c.proximo.porcentaje, 5.81, 0.005, 'próximo aumento 1/11 = 5,81%');
 // Aumento futuro que espera un IPC sin publicar
-const p = A.ajustesContrato({ inicio: '2025-12-01', monto: 500000, frecuencia: 3, indice: 'ipc', criterio: 'publicado', hoy: '2026-10-24' }, datos);
+const datosSinOctubre = { ...datos, ipc: { ...datos.ipc } };
+delete datosSinOctubre.ipc['2026-10'];
+const p = A.ajustesContrato({ inicio: '2025-12-01', monto: 500000, frecuencia: 3, indice: 'ipc', criterio: 'publicado', hoy: '2026-10-24' }, datosSinOctubre);
 const prox = p.ajustes[p.ajustes.length - 1];
 eq([prox.fecha, prox.estado, prox.publicaEl], ['2026-12-01', 'pendiente', '2026-11-12'], 'aumento de diciembre espera el IPC de octubre (12/11)');
 eq(p.proximo.fecha, '2026-12-01', 'próximo = diciembre');
